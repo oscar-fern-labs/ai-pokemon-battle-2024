@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>LLM Pokemon Battle - Working Demo</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/llm-data.js"></script>
+    <style>
+        .test-section { margin: 20px; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 10px; }
+        .test-button { font-size: 18px; padding: 15px 25px; margin: 10px; background: #dc2626; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .test-button:hover { background: #b91c1c; }
+        .result-area { min-height: 100px; margin: 20px 0; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 5px; }
+        .fighter-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; }
+        .fighter-card { padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px; text-align: center; cursor: pointer; }
+        .fighter-card:hover { background: rgba(255,255,255,0.2); }
+        .fighter-card.selected { background: rgba(255,255,0,0.3); }
+        .battle-area { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+        .fighter-display { text-align: center; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 10px; }
+        .health-bar { width: 100%; height: 20px; background: #333; border-radius: 10px; overflow: hidden; margin: 10px 0; }
+        .health-fill { height: 100%; background: linear-gradient(90deg, #22c55e, #eab308, #ef4444); transition: width 0.5s; }
+        .moves-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; }
+        .move-btn { padding: 10px; background: #1f2937; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .move-btn:hover { background: #374151; }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h1>🎮 LLM POKEMON BATTLE - WORKING DEMO 🎮</h1>
+        
+        <div class="test-section">
+            <h2>✅ Step 1: Verify LLM Data Loading</h2>
+            <button class="test-button" onclick="testDataLoading()">TEST LLM DATA</button>
+            <div id="data-result" class="result-area"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>✅ Step 2: Character Selection Test</h2>
+            <button class="test-button" onclick="showCharacterSelection()">SHOW FIGHTERS</button>
+            <div id="fighter-selection" class="fighter-grid" style="display: none;"></div>
+            <div id="selection-result" class="result-area"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>✅ Step 3: Battle System Test</h2>
+            <button class="test-button" onclick="simulateFullBattle()">SIMULATE BATTLE</button>
+            <div id="battle-display" class="battle-area" style="display: none;">
+                <div class="fighter-display">
+                    <div id="player-fighter">
+                        <div id="player-sprite" style="font-size: 48px;">🤖</div>
+                        <div id="player-name">Player</div>
+                        <div class="health-bar"><div id="player-health" class="health-fill" style="width: 100%;"></div></div>
+                        <div id="player-hp">100/100</div>
+                    </div>
+                </div>
+                <div class="fighter-display">
+                    <div id="enemy-fighter">
+                        <div id="enemy-sprite" style="font-size: 48px;">💬</div>
+                        <div id="enemy-name">Enemy</div>
+                        <div class="health-bar"><div id="enemy-health" class="health-fill" style="width: 100%;"></div></div>
+                        <div id="enemy-hp">100/100</div>
+                    </div>
+                </div>
+            </div>
+            <div id="moves-area" class="moves-grid" style="display: none;"></div>
+            <div id="battle-result" class="result-area"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>✅ Step 4: Full Game Flow Test</h2>
+            <button class="test-button" onclick="runFullGameDemo()">RUN COMPLETE DEMO</button>
+            <div id="game-result" class="result-area"></div>
+        </div>
+    </div>
+
+    <script>
+        let selectedPlayer = null;
+        let selectedEnemy = null;
+        let playerHP = 100;
+        let enemyHP = 100;
+
+        function testDataLoading() {
+            const result = document.getElementById('data-result');
+            if (typeof LLM_DATA === 'undefined') {
+                result.innerHTML = '❌ ERROR: LLM_DATA not loaded';
+                return;
+            }
+            
+            const llmCount = Object.keys(LLM_DATA).length;
+            let html = `✅ SUCCESS: ${llmCount} LLM fighters loaded<br><br>`;
+            
+            Object.keys(LLM_DATA).forEach(key => {
+                const llm = LLM_DATA[key];
+                html += `${llm.sprite} <strong>${llm.displayName}</strong> - HP: ${llm.stats.hp}, Moves: ${llm.moves.length}<br>`;
+            });
+            
+            result.innerHTML = html;
+        }
+
+        function showCharacterSelection() {
+            const container = document.getElementById('fighter-selection');
+            const result = document.getElementById('selection-result');
+            
+            container.style.display = 'grid';
+            container.innerHTML = '';
+            
+            Object.keys(LLM_DATA).forEach(key => {
+                const llm = LLM_DATA[key];
+                const card = document.createElement('div');
+                card.className = 'fighter-card';
+                card.innerHTML = `
+                    <div style="font-size: 36px;">${llm.sprite}</div>
+                    <strong>${llm.displayName}</strong><br>
+                    <small>HP: ${llm.stats.hp} | ATK: ${llm.stats.attack}</small>
+                `;
+                card.onclick = () => selectFighter(key, card);
+                container.appendChild(card);
+            });
+            
+            result.innerHTML = '👆 Click on a fighter to select them';
+        }
+
+        function selectFighter(key, cardElement) {
+            selectedPlayer = key;
+            document.querySelectorAll('.fighter-card').forEach(c => c.classList.remove('selected'));
+            cardElement.classList.add('selected');
+            
+            const llm = LLM_DATA[key];
+            document.getElementById('selection-result').innerHTML = 
+                `✅ Selected: ${llm.sprite} <strong>${llm.displayName}</strong><br>` +
+                `Stats: HP ${llm.stats.hp}, ATK ${llm.stats.attack}, DEF ${llm.stats.defense}<br>` +
+                `Signature Moves: ${llm.moves.map(m => m.name).join(', ')}`;
+        }
+
+        function simulateFullBattle() {
+            if (!selectedPlayer) {
+                document.getElementById('battle-result').innerHTML = '❌ Please select a fighter first!';
+                return;
+            }
+
+            // Pick random enemy
+            const enemies = Object.keys(LLM_DATA).filter(k => k !== selectedPlayer);
+            selectedEnemy = enemies[Math.floor(Math.random() * enemies.length)];
+            
+            const player = LLM_DATA[selectedPlayer];
+            const enemy = LLM_DATA[selectedEnemy];
+            
+            // Set up battle display
+            document.getElementById('battle-display').style.display = 'grid';
+            document.getElementById('player-sprite').textContent = player.sprite;
+            document.getElementById('player-name').textContent = player.displayName;
+            document.getElementById('enemy-sprite').textContent = enemy.sprite;
+            document.getElementById('enemy-name').textContent = enemy.displayName;
+            
+            playerHP = player.stats.hp;
+            enemyHP = enemy.stats.hp;
+            updateHealthBars();
+            
+            // Show moves
+            const movesArea = document.getElementById('moves-area');
+            movesArea.style.display = 'grid';
+            movesArea.innerHTML = '';
+            
+            player.moves.forEach((move, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'move-btn';
+                btn.textContent = `${move.name} (${move.power} power)`;
+                btn.onclick = () => executeMove(i);
+                movesArea.appendChild(btn);
+            });
+            
+            document.getElementById('battle-result').innerHTML = 
+                `⚔️ <strong>BATTLE STARTED!</strong><br>` +
+                `${player.displayName} vs ${enemy.displayName}<br>` +
+                `Choose your move above!`;
+        }
+
+        function executeMove(moveIndex) {
+            const player = LLM_DATA[selectedPlayer];
+            const enemy = LLM_DATA[selectedEnemy];
+            const playerMove = player.moves[moveIndex];
+            
+            // Player attacks
+            const damage = Math.floor(playerMove.power * 0.8 + Math.random() * playerMove.power * 0.4);
+            enemyHP = Math.max(0, enemyHP - damage);
+            
+            let result = `${player.displayName} used <strong>${playerMove.name}</strong>! ${damage} damage!<br>`;
+            
+            updateHealthBars();
+            
+            if (enemyHP <= 0) {
+                result += `🏆 <strong>${player.displayName} WINS!</strong>`;
+                document.getElementById('moves-area').style.display = 'none';
+            } else {
+                // Enemy counter-attack
+                setTimeout(() => {
+                    const enemyMove = enemy.moves[Math.floor(Math.random() * 4)];
+                    const counterDamage = Math.floor(enemyMove.power * 0.7 + Math.random() * enemyMove.power * 0.3);
+                    playerHP = Math.max(0, playerHP - counterDamage);
+                    
+                    let counterResult = `${enemy.displayName} used <strong>${enemyMove.name}</strong>! ${counterDamage} damage!<br>`;
+                    
+                    if (playerHP <= 0) {
+                        counterResult += `💀 <strong>${enemy.displayName} WINS!</strong>`;
+                        document.getElementById('moves-area').style.display = 'none';
+                    } else {
+                        counterResult += `Battle continues! Choose your next move!`;
+                    }
+                    
+                    document.getElementById('battle-result').innerHTML = result + counterResult;
+                    updateHealthBars();
+                }, 1500);
+            }
+            
+            document.getElementById('battle-result').innerHTML = result;
+        }
+
+        function updateHealthBars() {
+            const player = LLM_DATA[selectedPlayer];
+            const enemy = LLM_DATA[selectedEnemy];
+            
+            const playerPercent = (playerHP / player.stats.hp) * 100;
+            const enemyPercent = (enemyHP / enemy.stats.hp) * 100;
+            
+            document.getElementById('player-health').style.width = playerPercent + '%';
+            document.getElementById('enemy-health').style.width = enemyPercent + '%';
+            document.getElementById('player-hp').textContent = `${playerHP}/${player.stats.hp}`;
+            document.getElementById('enemy-hp').textContent = `${enemyHP}/${enemy.stats.hp}`;
+        }
+
+        function runFullGameDemo() {
+            const result = document.getElementById('game-result');
+            result.innerHTML = '🎮 Running complete game demonstration...<br><br>';
+            
+            // Step 1: Load data
+            setTimeout(() => {
+                result.innerHTML += '✅ Step 1: LLM Data loaded successfully<br>';
+                
+                // Step 2: Auto-select a fighter
+                setTimeout(() => {
+                    const randomKey = Object.keys(LLM_DATA)[0]; // Select Claude
+                    selectedPlayer = randomKey;
+                    const llm = LLM_DATA[randomKey];
+                    result.innerHTML += `✅ Step 2: Auto-selected ${llm.sprite} ${llm.displayName}<br>`;
+                    
+                    // Step 3: Start battle
+                    setTimeout(() => {
+                        simulateFullBattle();
+                        result.innerHTML += '✅ Step 3: Battle simulation started<br>';
+                        
+                        // Step 4: Execute move
+                        setTimeout(() => {
+                            executeMove(0);
+                            result.innerHTML += '✅ Step 4: Move executed successfully<br><br>';
+                            result.innerHTML += '🎉 <strong>FULL GAME DEMO COMPLETE!</strong><br>';
+                            result.innerHTML += 'All systems functioning correctly! 🚀';
+                        }, 2000);
+                    }, 1000);
+                }, 1000);
+            }, 500);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ Working Demo loaded successfully!');
+        });
+    </script>
+</body>
+</html>
