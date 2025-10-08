@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Pokemon Battle - The AI Showdown</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="game-container">
+        
+        <!-- TITLE SCREEN -->
+        <div id="title-screen" class="screen active">
+            <div class="title-logo">
+                <h1>🎮 LLM POKEMON BATTLE 🎮</h1>
+                <div class="subtitle">The AI Showdown!</div>
+                <div class="title-sparkles">✨⭐✨</div>
+            </div>
+            
+            <div class="menu-options">
+                <button class="game-button primary" id="start-button">START BATTLE</button>
+                <button class="game-button secondary" onclick="showModal()">HOW TO PLAY</button>
+            </div>
+            
+            <div class="title-info">
+                <h3>🤖 Featured LLM Fighters 🤖</h3>
+                <div class="fighter-preview">
+                    <span class="fighter-icon">🤖 Claude</span>
+                    <span class="fighter-icon">💬 ChatGPT</span>
+                    <span class="fighter-icon">💎 Gemini</span>
+                    <span class="fighter-icon">😏 Grok</span>
+                </div>
+                <div class="fighter-preview">
+                    <span class="fighter-icon">🦙 Llama</span>
+                    <span class="fighter-icon">🧠 Kimi</span>
+                    <span class="fighter-icon">🌪️ Mistral</span>
+                    <span class="fighter-icon">🏮 Qwen</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHARACTER SELECT SCREEN -->
+        <div id="selection-screen" class="screen">
+            <div class="screen-header">
+                <h2>Choose Your LLM Fighter!</h2>
+                <div class="select-instruction">Click on an LLM to select your fighter</div>
+            </div>
+            
+            <div id="llm-selection" class="character-grid">
+                <!-- Characters will be dynamically loaded here -->
+            </div>
+            
+            <div class="select-controls">
+                <button class="game-button secondary" onclick="showTitleScreen()">BACK</button>
+                <button class="game-button primary disabled" id="confirm-selection" disabled>SELECT FIGHTER</button>
+            </div>
+        </div>
+
+        <!-- BATTLE SCREEN -->
+        <div id="battle-screen" class="screen">
+            <div class="battle-ui">
+                <!-- Enemy Pokemon Area -->
+                <div class="enemy-area">
+                    <div class="pokemon-info enemy">
+                        <div class="pokemon-name" id="opponent-name">Wild ChatGPT</div>
+                        <div class="health-bar-container">
+                            <div class="health-bar">
+                                <div class="health-fill" id="opponent-health"></div>
+                            </div>
+                            <div class="health-text" id="opponent-hp">100/100</div>
+                        </div>
+                    </div>
+                    <div class="pokemon-sprite enemy" id="opponent-sprite">💬</div>
+                </div>
+
+                <!-- Player Pokemon Area -->
+                <div class="player-area">
+                    <div class="pokemon-sprite player" id="player-sprite">🤖</div>
+                    <div class="pokemon-info player">
+                        <div class="pokemon-name" id="player-name">Claude-3.5</div>
+                        <div class="health-bar-container">
+                            <div class="health-bar">
+                                <div class="health-fill" id="player-health"></div>
+                            </div>
+                            <div class="health-text" id="player-hp">95/95</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Battle UI Controls -->
+                <div class="battle-controls">
+                    <div id="main-menu" class="battle-menu main-menu">
+                        <div class="battle-text" id="battle-text">What will Claude-3.5 do?</div>
+                        <div class="battle-buttons">
+                            <button class="battle-button" onclick="showAttackMenu()">ATTACK</button>
+                            <button class="battle-button disabled">ITEMS</button>
+                            <button class="battle-button" onclick="showTitleScreen()">SWITCH</button>
+                            <button class="battle-button" onclick="showTitleScreen()">RUN</button>
+                        </div>
+                    </div>
+
+                    <!-- Attack Menu -->
+                    <div id="attack-menu" class="battle-menu attack-menu hidden">
+                        <div id="attack-options" class="attack-grid">
+                            <!-- Attacks will be populated dynamically -->
+                        </div>
+                        <button class="battle-button back-button" onclick="showMainMenu()">BACK</button>
+                    </div>
+
+                    <!-- Battle Log -->
+                    <div id="battle-log" class="battle-log hidden">
+                        <div class="log-text" id="log-text">Claude used Constitutional AI!</div>
+                        <div class="continue-prompt">Press SPACE to continue...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VICTORY SCREEN -->
+        <div id="victory-screen" class="screen">
+            <div class="victory-content">
+                <h2 id="victory-text">Victory!</h2>
+                <div id="victory-message">Claude-3.5 wins the AI showdown!</div>
+                <div class="victory-sprite" id="victory-sprite">🤖</div>
+                <div class="victory-controls">
+                    <button class="game-button primary" onclick="startNewGame()">PLAY AGAIN</button>
+                    <button class="game-button secondary" onclick="showTitleScreen()">MAIN MENU</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- HOW TO PLAY MODAL -->
+        <div id="how-to-play-modal" class="modal hidden">
+            <div class="modal-content">
+                <h3>How to Play</h3>
+                <div class="instructions">
+                    <p>• Choose your LLM fighter from 8 powerful AI models</p>
+                    <p>• Battle against other LLMs in turn-based combat</p>
+                    <p>• Each LLM has unique stats, types, and special attacks</p>
+                    <p>• Use ATTACK to choose from 4 signature moves</p>
+                    <p>• Defeat your opponent by reducing their HP to 0</p>
+                    <p>• Master type effectiveness for strategic advantage!</p>
+                </div>
+                <button class="game-button primary" onclick="hideModal()">GOT IT!</button>
+            </div>
+        </div>
+
+        <!-- Audio Toggle -->
+        <div class="audio-toggle">
+            <button id="audio-btn" class="audio-button" title="Toggle Audio" onclick="toggleAudio()">🔊</button>
+        </div>
+
+    </div>
+
+    <!-- Game Scripts -->
+    <script src="js/llm-data.js"></script>
+    <script src="js/audio-generator.js"></script>
+    <script src="js/battle-engine.js"></script>
+    
+    <script>
+        // Global game state
+        let selectedLLM = null;
+        let battleInProgress = false;
+        let audioEnabled = false;
+
+        // Screen management
+        function showScreen(screenName) {
+            // Hide all screens
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // Show target screen
+            const targetScreen = document.getElementById(screenName + '-screen');
+            if (targetScreen) {
+                targetScreen.classList.add('active');
+            }
+        }
+
+        function showTitleScreen() {
+            showScreen('title');
+        }
+
+        function showSelectionScreen() {
+            showScreen('selection');
+            populateLLMSelection();
+        }
+
+        function showBattleScreen() {
+            showScreen('battle');
+        }
+
+        function showVictoryScreen() {
+            showScreen('victory');
+        }
+
+        // LLM Selection
+        function populateLLMSelection() {
+            const container = document.getElementById('llm-selection');
+            container.innerHTML = '';
+            
+            Object.keys(LLM_DATA).forEach(llmKey => {
+                const llm = LLM_DATA[llmKey];
+                const card = document.createElement('div');
+                card.className = 'llm-card';
+                card.dataset.llm = llmKey;
+                card.onclick = () => selectLLM(llmKey);
+                
+                card.innerHTML = `
+                    <div class="llm-sprite-preview">${llm.sprite}</div>
+                    <div class="llm-name">${llm.displayName}</div>
+                    <div class="llm-type">Type: ${llm.type.map(t => t.charAt(0).toUpperCase() + t.slice(1)).join('/')}</div>
+                    <div class="llm-stats">
+                        HP: ${llm.stats.hp}<br>
+                        ATK: ${llm.stats.attack}<br>
+                        DEF: ${llm.stats.defense}<br>
+                        SPD: ${llm.stats.speed}
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        function selectLLM(llmKey) {
+            selectedLLM = llmKey;
+            
+            // Update visual selection
+            document.querySelectorAll('.llm-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.querySelector(`[data-llm="${llmKey}"]`).classList.add('selected');
+            
+            // Enable confirm button
+            const confirmBtn = document.getElementById('confirm-selection');
+            confirmBtn.disabled = false;
+            confirmBtn.classList.remove('disabled');
+            confirmBtn.onclick = startBattle;
+        }
+
+        // Battle System
+        function startBattle() {
+            if (!selectedLLM) return;
+            
+            // Choose random opponent
+            const llmKeys = Object.keys(LLM_DATA);
+            const opponentKey = llmKeys[Math.floor(Math.random() * llmKeys.length)];
+            
+            // Set up battle UI
+            const playerLLM = LLM_DATA[selectedLLM];
+            const opponentLLM = LLM_DATA[opponentKey];
+            
+            document.getElementById('player-name').textContent = playerLLM.displayName;
+            document.getElementById('player-sprite').textContent = playerLLM.sprite;
+            document.getElementById('player-hp').textContent = `${playerLLM.stats.hp}/${playerLLM.stats.hp}`;
+            document.getElementById('player-health').style.width = '100%';
+            
+            document.getElementById('opponent-name').textContent = opponentLLM.displayName;
+            document.getElementById('opponent-sprite').textContent = opponentLLM.sprite;
+            document.getElementById('opponent-hp').textContent = `${opponentLLM.stats.hp}/${opponentLLM.stats.hp}`;
+            document.getElementById('opponent-health').style.width = '100%';
+            
+            document.getElementById('battle-text').textContent = `What will ${playerLLM.displayName} do?`;
+            
+            // Populate attack menu
+            populateAttackMenu();
+            
+            showBattleScreen();
+            battleInProgress = true;
+        }
+
+        function populateAttackMenu() {
+            if (!selectedLLM) return;
+            
+            const container = document.getElementById('attack-options');
+            container.innerHTML = '';
+            
+            const llm = LLM_DATA[selectedLLM];
+            llm.moves.forEach((move, index) => {
+                const button = document.createElement('button');
+                button.className = 'attack-button';
+                button.onclick = () => useAttack(index);
+                button.innerHTML = `
+                    <div class="move-name">${move.name}</div>
+                    <div class="move-details">
+                        <span>Power: ${move.power}</span>
+                        <span>Accuracy: ${move.accuracy}%</span>
+                    </div>
+                    <div class="move-type">${move.type.toUpperCase()}</div>
+                `;
+                container.appendChild(button);
+            });
+        }
+
+        function showAttackMenu() {
+            document.getElementById('main-menu').classList.add('hidden');
+            document.getElementById('attack-menu').classList.remove('hidden');
+        }
+
+        function showMainMenu() {
+            document.getElementById('attack-menu').classList.add('hidden');
+            document.getElementById('main-menu').classList.remove('hidden');
+        }
+
+        function useAttack(moveIndex) {
+            if (!selectedLLM || !battleInProgress) return;
+            
+            const playerLLM = LLM_DATA[selectedLLM];
+            const move = playerLLM.moves[moveIndex];
+            
+            // Simple battle simulation
+            const damage = Math.floor(move.power * 0.7 + Math.random() * move.power * 0.6);
+            
+            // Show battle result
+            setTimeout(() => {
+                document.getElementById('victory-text').textContent = 'Victory!';
+                document.getElementById('victory-message').textContent = `${playerLLM.displayName} used ${move.name} and won!`;
+                document.getElementById('victory-sprite').textContent = playerLLM.sprite;
+                showVictoryScreen();
+                battleInProgress = false;
+            }, 2000);
+            
+            // Show attack animation/log
+            document.getElementById('battle-text').textContent = `${playerLLM.displayName} used ${move.name}!`;
+        }
+
+        function startNewGame() {
+            selectedLLM = null;
+            battleInProgress = false;
+            showSelectionScreen();
+        }
+
+        // Modal functions
+        function showModal() {
+            document.getElementById('how-to-play-modal').classList.remove('hidden');
+        }
+
+        function hideModal() {
+            document.getElementById('how-to-play-modal').classList.add('hidden');
+        }
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            document.getElementById('audio-btn').textContent = audioEnabled ? '🔊' : '🔇';
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎮 Loading LLM Pokemon Battle...');
+            
+            // Set up start button
+            document.getElementById('start-button').onclick = showSelectionScreen;
+            
+            // Initialize audio system
+            if (typeof audioGenerator !== 'undefined') {
+                audioGenerator.init().then(() => {
+                    console.log('Audio system initialized');
+                }).catch(() => {
+                    console.log('Audio system failed to initialize');
+                });
+            }
+            
+            console.log('✅ LLM Pokemon Battle loaded!');
+        });
+    </script>
+</body>
+</html>

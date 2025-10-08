@@ -1,393 +1,225 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LLM Pokemon Battle</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Courier New', monospace;
-            background: #1a1a1a;
-            overflow: hidden;
-            color: white;
-        }
-
-        #game-container {
-            width: 100vw;
-            height: 100vh;
-            position: relative;
-        }
-
-        .screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: none;
-            background: linear-gradient(45deg, #2c5aa0, #1e3a8a);
-        }
-
-        .screen.active {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #title-screen {
-            background: linear-gradient(45deg, #4c1d95, #1e1b4b);
-            text-align: center;
-        }
-
-        .title-content {
-            background: rgba(0, 0, 0, 0.8);
-            padding: 40px;
-            border: 4px solid #fbbf24;
-            border-radius: 0;
-            box-shadow: 8px 8px 0px #000;
-        }
-
-        .game-title {
-            font-size: 24px;
-            color: #fbbf24;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 0px #000;
-            letter-spacing: 2px;
-        }
-
-        .subtitle {
-            font-size: 12px;
-            color: #e5e7eb;
-            margin-bottom: 30px;
-        }
-
-        .credits {
-            margin-top: 30px;
-            font-size: 8px;
-            color: #9ca3af;
-            line-height: 1.6;
-        }
-
-        .pixel-button {
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            padding: 15px 30px;
-            background: #dc2626;
-            color: white;
-            border: 3px solid #991b1b;
-            cursor: pointer;
-            text-transform: uppercase;
-            box-shadow: 3px 3px 0px #000;
-            transition: all 0.1s;
-        }
-
-        .pixel-button:hover {
-            background: #ef4444;
-            transform: translate(1px, 1px);
-            box-shadow: 2px 2px 0px #000;
-        }
-
-        .pixel-button:disabled {
-            background: #6b7280;
-            border-color: #4b5563;
-            cursor: not-allowed;
-        }
-
-        #selection-screen {
-            padding: 40px;
-            text-align: center;
-        }
-
-        #selection-screen h2 {
-            color: #fbbf24;
-            font-size: 16px;
-            margin-bottom: 30px;
-            text-shadow: 2px 2px 0px #000;
-        }
-
-        .llm-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 40px;
-            max-width: 800px;
-        }
-
-        .llm-card {
-            background: rgba(0, 0, 0, 0.8);
-            border: 3px solid #374151;
-            padding: 20px;
-            cursor: pointer;
-            transition: all 0.1s;
-            text-align: center;
-        }
-
-        .llm-card:hover {
-            border-color: #fbbf24;
-            transform: scale(1.05);
-        }
-
-        .llm-card.selected {
-            border-color: #dc2626;
-            background: rgba(220, 38, 38, 0.2);
-        }
-
-        .llm-sprite-preview {
-            width: 64px;
-            height: 64px;
-            background: #4b5563;
-            margin: 0 auto 15px;
-            border: 2px solid #6b7280;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
-        .llm-name {
-            font-size: 10px;
-            color: #e5e7eb;
-            margin-bottom: 10px;
-        }
-
-        .llm-type {
-            font-size: 8px;
-            color: #9ca3af;
-            margin-bottom: 10px;
-        }
-
-        .llm-stats {
-            font-size: 6px;
-            color: #6b7280;
-            text-align: left;
-            line-height: 1.4;
-        }
-    </style>
+    <title>LLM Pokemon Battle - The AI Showdown</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="game-container">
-        <!-- Title Screen -->
         <div id="title-screen" class="screen active">
-            <div class="title-content">
-                <h1 class="game-title">🎮 LLM POKEMON BATTLE 🎮</h1>
-                <div class="subtitle">The AI Showdown!</div>
-                <button id="start-button" class="pixel-button">START BATTLE</button>
-                <div class="credits">
-                    <p>Featuring: 🤖 Claude • 💬 ChatGPT • 💎 Gemini • 😏 Grok • 🦙 Llama • 🧠 Kimi • 🌪️ Mistral • 🏮 Qwen</p>
+            <h1>🎮 LLM POKEMON BATTLE 🎮</h1>
+            <div class="subtitle">The AI Showdown!</div>
+            <div class="title-sparkles">✨⭐✨</div>
+            <button class="game-button primary" id="start-btn">START BATTLE</button>
+            <div class="fighter-preview">
+                <div>🤖 Claude • 💬 ChatGPT • 💎 Gemini • 😏 Grok</div>
+                <div>🦙 Llama • 🧠 Kimi • 🌪️ Mistral • 🏮 Qwen</div>
+            </div>
+        </div>
+
+        <div id="selection-screen" class="screen">
+            <h2>Choose Your Fighter!</h2>
+            <div id="character-list"></div>
+            <button class="game-button" id="back-btn">BACK</button>
+        </div>
+
+        <div id="battle-screen" class="screen">
+            <div class="battle-area">
+                <div class="enemy-info">
+                    <div id="enemy-name">Enemy</div>
+                    <div class="health-bar"><div id="enemy-health" class="health-fill"></div></div>
+                    <div id="enemy-sprite">💻</div>
+                </div>
+                <div class="player-info">
+                    <div id="player-sprite">🤖</div>
+                    <div id="player-name">Player</div>
+                    <div class="health-bar"><div id="player-health" class="health-fill"></div></div>
                 </div>
             </div>
+            <div class="battle-controls">
+                <div id="battle-text">What will you do?</div>
+                <button class="battle-button" id="attack-btn">ATTACK</button>
+                <button class="battle-button" id="run-btn">RUN</button>
+            </div>
+            <div id="move-menu" class="hidden">
+                <div id="move-list"></div>
+                <button id="move-back-btn">BACK</button>
+            </div>
         </div>
 
-        <!-- Pokemon Selection Screen -->
-        <div id="selection-screen" class="screen">
-            <h2>Choose Your LLM Fighter!</h2>
-            <div id="llm-selection" class="llm-grid">
-                <!-- LLM options will be populated by JavaScript -->
-            </div>
-            <button id="confirm-selection" class="pixel-button" disabled>CONFIRM SELECTION</button>
-        </div>
-
-        <!-- Simple Victory Message -->
-        <div id="victory-screen" class="screen" style="text-align: center;">
-            <div style="background: rgba(0,0,0,0.8); padding: 40px; border: 4px solid #fbbf24;">
-                <h2 id="victory-text" style="font-size: 24px; color: #fbbf24; margin-bottom: 20px;">Victory!</h2>
-                <div id="victory-message" style="color: #e5e7eb; margin-bottom: 30px;">Your LLM has proven superior!</div>
-                <button id="play-again" class="pixel-button">BATTLE AGAIN</button>
-            </div>
+        <div id="victory-screen" class="screen">
+            <h2 id="result-title">Victory!</h2>
+            <div id="result-message">You won!</div>
+            <button class="game-button" id="play-again-btn">PLAY AGAIN</button>
+            <button class="game-button" id="main-menu-btn">MAIN MENU</button>
         </div>
     </div>
 
+    <script src="js/llm-data.js"></script>
     <script>
-        // Simplified LLM data
-        const LLM_DATA = {
-            claude: {
-                name: "Claude",
-                displayName: "Claude-3.5",
-                sprite: "🤖",
-                color: "#8b5cf6",
-                stats: { hp: 95, attack: 85, defense: 90, speed: 75 }
-            },
-            chatgpt: {
-                name: "ChatGPT",
-                displayName: "ChatGPT-4",
-                sprite: "💬",
-                color: "#10b981",
-                stats: { hp: 90, attack: 80, defense: 75, speed: 95 }
-            },
-            gemini: {
-                name: "Gemini",
-                displayName: "Gemini-Pro",
-                sprite: "💎",
-                color: "#06b6d4",
-                stats: { hp: 85, attack: 90, defense: 80, speed: 85 }
-            },
-            grok: {
-                name: "Grok",
-                displayName: "Grok-2",
-                sprite: "😏",
-                color: "#ef4444",
-                stats: { hp: 100, attack: 95, defense: 70, speed: 90 }
-            },
-            llama: {
-                name: "Llama",
-                displayName: "Llama-70B",
-                sprite: "🦙",
-                color: "#84cc16",
-                stats: { hp: 110, attack: 85, defense: 95, speed: 70 }
-            },
-            kimi: {
-                name: "Kimi",
-                displayName: "Kimi-Chat",
-                sprite: "🧠",
-                color: "#ec4899",
-                stats: { hp: 105, attack: 75, defense: 85, speed: 80 }
-            },
-            mistral: {
-                name: "Mistral",
-                displayName: "Mistral-Large",
-                sprite: "🌪️",
-                color: "#6b7280",
-                stats: { hp: 85, attack: 90, defense: 85, speed: 100 }
-            },
-            qwen: {
-                name: "Qwen",
-                displayName: "Qwen-72B",
-                sprite: "🏮",
-                color: "#f59e0b",
-                stats: { hp: 95, attack: 85, defense: 90, speed: 85 }
-            }
-        };
+        let selectedLLM = null;
+        let enemyLLM = null;
+        let playerHP = 100;
+        let enemyHP = 100;
 
-        // Simple game logic
-        class SimpleGame {
-            constructor() {
-                this.selectedLLM = null;
-                this.currentScreen = 'title';
-                this.init();
-            }
-
-            init() {
-                this.setupEventListeners();
-                console.log('LLM Pokemon Battle initialized!');
-            }
-
-            setupEventListeners() {
-                document.getElementById('start-button').addEventListener('click', () => {
-                    this.showScreen('selection');
-                    this.populateLLMSelection();
-                });
-
-                document.getElementById('confirm-selection').addEventListener('click', () => {
-                    if (this.selectedLLM) {
-                        this.startBattle();
-                    }
-                });
-
-                document.getElementById('play-again').addEventListener('click', () => {
-                    this.resetGame();
-                });
-
-                document.addEventListener('click', (e) => {
-                    if (e.target.classList.contains('llm-card')) {
-                        this.selectLLM(e.target.dataset.llm);
-                    }
-                });
-
-                // Audio toggle
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === 'm' || e.key === 'M') {
-                        console.log('Music toggled!');
-                    }
-                });
-            }
-
-            showScreen(screenName) {
-                document.querySelectorAll('.screen').forEach(screen => {
-                    screen.classList.remove('active');
-                });
-                
-                const targetScreen = document.getElementById(screenName + '-screen');
-                if (targetScreen) {
-                    targetScreen.classList.add('active');
-                    this.currentScreen = screenName;
-                }
-            }
-
-            populateLLMSelection() {
-                const container = document.getElementById('llm-selection');
-                container.innerHTML = '';
-
-                Object.keys(LLM_DATA).forEach(llmKey => {
-                    const llm = LLM_DATA[llmKey];
-                    const card = document.createElement('div');
-                    card.className = 'llm-card';
-                    card.dataset.llm = llmKey;
-                    
-                    card.innerHTML = `
-                        <div class="llm-sprite-preview">${llm.sprite}</div>
-                        <div class="llm-name">${llm.displayName}</div>
-                        <div class="llm-type">AI Model</div>
-                        <div class="llm-stats">
-                            HP: ${llm.stats.hp}<br>
-                            ATK: ${llm.stats.attack}<br>
-                            DEF: ${llm.stats.defense}<br>
-                            SPD: ${llm.stats.speed}
-                        </div>
-                    `;
-                    
-                    container.appendChild(card);
-                });
-            }
-
-            selectLLM(llmKey) {
-                document.querySelectorAll('.llm-card').forEach(card => {
-                    card.classList.remove('selected');
-                });
-                
-                const selectedCard = document.querySelector(`[data-llm="${llmKey}"]`);
-                if (selectedCard) {
-                    selectedCard.classList.add('selected');
-                    this.selectedLLM = llmKey;
-                    document.getElementById('confirm-selection').disabled = false;
-                }
-            }
-
-            startBattle() {
-                const selectedLLMData = LLM_DATA[this.selectedLLM];
-                const opponentKeys = Object.keys(LLM_DATA).filter(key => key !== this.selectedLLM);
-                const opponentKey = opponentKeys[Math.floor(Math.random() * opponentKeys.length)];
-                const opponentLLMData = LLM_DATA[opponentKey];
-                
-                // Simple battle outcome (random for now)
-                const playerWins = Math.random() > 0.5;
-                
-                document.getElementById('victory-text').textContent = playerWins ? 'Victory!' : 'Defeat!';
-                document.getElementById('victory-message').textContent = 
-                    playerWins 
-                        ? `${selectedLLMData.displayName} defeated ${opponentLLMData.displayName}!`
-                        : `${opponentLLMData.displayName} defeated ${selectedLLMData.displayName}!`;
-                
-                this.showScreen('victory');
-                console.log('Battle: ' + selectedLLMData.displayName + ' vs ' + opponentLLMData.displayName);
-            }
-
-            resetGame() {
-                this.selectedLLM = null;
-                document.getElementById('confirm-selection').disabled = true;
-                this.showScreen('title');
-            }
+        function showScreen(name) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(name + '-screen').classList.add('active');
         }
 
-        // Initialize game when DOM is loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            window.game = new SimpleGame();
+        function loadCharacters() {
+            const list = document.getElementById('character-list');
+            list.innerHTML = '';
+            
+            Object.keys(LLM_DATA).forEach(key => {
+                const llm = LLM_DATA[key];
+                const div = document.createElement('div');
+                div.className = 'character-card';
+                div.innerHTML = \`
+                    <div class="char-sprite">\${llm.sprite}</div>
+                    <div class="char-name">\${llm.displayName}</div>
+                    <div class="char-stats">HP: \${llm.stats.hp} | ATK: \${llm.stats.attack}</div>
+                \`;
+                div.addEventListener('click', () => selectCharacter(key));
+                list.appendChild(div);
+            });
+        }
+
+        function selectCharacter(key) {
+            selectedLLM = key;
+            document.querySelectorAll('.character-card').forEach(c => c.classList.remove('selected'));
+            event.target.closest('.character-card').classList.add('selected');
+            
+            setTimeout(() => startBattle(), 500);
+        }
+
+        function startBattle() {
+            const enemies = Object.keys(LLM_DATA).filter(k => k !== selectedLLM);
+            enemyLLM = enemies[Math.floor(Math.random() * enemies.length)];
+            
+            const player = LLM_DATA[selectedLLM];
+            const enemy = LLM_DATA[enemyLLM];
+            
+            document.getElementById('player-name').textContent = player.displayName;
+            document.getElementById('player-sprite').textContent = player.sprite;
+            document.getElementById('enemy-name').textContent = enemy.displayName;
+            document.getElementById('enemy-sprite').textContent = enemy.sprite;
+            
+            playerHP = player.stats.hp;
+            enemyHP = enemy.stats.hp;
+            updateHealth();
+            loadMoves();
+            
+            showScreen('battle');
+            document.getElementById('battle-text').textContent = \`What will \${player.displayName} do?\`;
+        }
+
+        function updateHealth() {
+            const playerPct = (playerHP / LLM_DATA[selectedLLM].stats.hp) * 100;
+            const enemyPct = (enemyHP / LLM_DATA[enemyLLM].stats.hp) * 100;
+            
+            document.getElementById('player-health').style.width = playerPct + '%';
+            document.getElementById('enemy-health').style.width = enemyPct + '%';
+        }
+
+        function loadMoves() {
+            const list = document.getElementById('move-list');
+            list.innerHTML = '';
+            
+            LLM_DATA[selectedLLM].moves.forEach((move, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'move-button';
+                btn.textContent = \`\${move.name} (\${move.power} power)\`;
+                btn.addEventListener('click', () => useMove(i));
+                list.appendChild(btn);
+            });
+        }
+
+        function useMove(index) {
+            document.getElementById('move-menu').classList.add('hidden');
+            const move = LLM_DATA[selectedLLM].moves[index];
+            const damage = Math.floor(move.power * 0.8 + Math.random() * move.power * 0.4);
+            
+            enemyHP = Math.max(0, enemyHP - damage);
+            document.getElementById('battle-text').textContent = 
+                \`\${LLM_DATA[selectedLLM].displayName} used \${move.name}! \${damage} damage!\`;
+            
+            updateHealth();
+            
+            if (enemyHP <= 0) {
+                setTimeout(() => endBattle(true), 1000);
+                return;
+            }
+            
+            setTimeout(() => {
+                const enemyMove = LLM_DATA[enemyLLM].moves[Math.floor(Math.random() * 4)];
+                const counterDmg = Math.floor(enemyMove.power * 0.7 + Math.random() * enemyMove.power * 0.3);
+                playerHP = Math.max(0, playerHP - counterDmg);
+                
+                document.getElementById('battle-text').textContent = 
+                    \`\${LLM_DATA[enemyLLM].displayName} used \${enemyMove.name}! \${counterDmg} damage!\`;
+                
+                updateHealth();
+                
+                if (playerHP <= 0) {
+                    setTimeout(() => endBattle(false), 1000);
+                } else {
+                    setTimeout(() => {
+                        document.getElementById('battle-text').textContent = 
+                            \`What will \${LLM_DATA[selectedLLM].displayName} do?\`;
+                    }, 2000);
+                }
+            }, 1500);
+        }
+
+        function endBattle(won) {
+            if (won) {
+                document.getElementById('result-title').textContent = 'Victory!';
+                document.getElementById('result-message').textContent = 
+                    \`\${LLM_DATA[selectedLLM].displayName} wins!\`;
+            } else {
+                document.getElementById('result-title').textContent = 'Defeat!';
+                document.getElementById('result-message').textContent = 
+                    \`\${LLM_DATA[enemyLLM].displayName} wins!\`;
+            }
+            showScreen('victory');
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('start-btn').addEventListener('click', () => {
+                showScreen('selection');
+                loadCharacters();
+            });
+            
+            document.getElementById('back-btn').addEventListener('click', () => {
+                showScreen('title');
+            });
+            
+            document.getElementById('attack-btn').addEventListener('click', () => {
+                document.getElementById('move-menu').classList.remove('hidden');
+            });
+            
+            document.getElementById('move-back-btn').addEventListener('click', () => {
+                document.getElementById('move-menu').classList.add('hidden');
+            });
+            
+            document.getElementById('run-btn').addEventListener('click', () => {
+                showScreen('title');
+            });
+            
+            document.getElementById('play-again-btn').addEventListener('click', () => {
+                showScreen('selection');
+                loadCharacters();
+            });
+            
+            document.getElementById('main-menu-btn').addEventListener('click', () => {
+                showScreen('title');
+            });
+            
+            console.log('✅ LLM Pokemon Battle ready!');
         });
     </script>
 </body>
